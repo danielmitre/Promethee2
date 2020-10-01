@@ -24,10 +24,6 @@ struct Opts {
     weight: f64,
     #[clap(long, arg_enum, about = "Implementation of Promethee to use", required = true)]
     version: PrometheeImplementation,
-    /* TODO: See how functions are parsed in C++ version
-    #[clap(long, short = 'f', about = "Preference functions and preference functions parameter", parse(try_from_str), required = true)]
-    function: PreferenceFunction,
-    */
     #[clap(subcommand)]
     function: PreferenceFunction,
 }
@@ -46,7 +42,6 @@ fn main() {
 
     match args.version {
         PrometheeImplementation::Vanilla => {
-            // TODO: actually call the method, something like
             promethee::vanilla::Vanilla::rank(criteria, flow.as_mut());
         },
         PrometheeImplementation::Fast => {
