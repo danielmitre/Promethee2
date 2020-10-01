@@ -1,5 +1,5 @@
-mod promethee;
 mod function;
+mod promethee;
 
 use crate::promethee::*;
 use clap::Clap;
@@ -22,7 +22,12 @@ enum PreferenceFunction {
 struct Opts {
     #[clap(long, short = 'w', about = "Weight of criteria", required = true)]
     weight: f64,
-    #[clap(long, arg_enum, about = "Implementation of Promethee to use", required = true)]
+    #[clap(
+        long,
+        arg_enum,
+        about = "Implementation of Promethee to use",
+        required = true
+    )]
     version: PrometheeImplementation,
     #[clap(subcommand)]
     function: PreferenceFunction,
@@ -43,7 +48,7 @@ fn main() {
     match args.version {
         PrometheeImplementation::Vanilla => {
             promethee::vanilla::Vanilla::rank(criteria, flow.as_mut());
-        },
+        }
         PrometheeImplementation::Fast => {
             unimplemented!("Fast 'n Furious version wasn't implemented yet.");
         }
