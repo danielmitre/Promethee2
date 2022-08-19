@@ -45,4 +45,18 @@ mod tests {
             vec![-0.5, -0.375, -0.25, -0.125, -0.0, 0.125, 0.25, 0.375, 0.5]
         );
     }
+
+    #[test]
+    fn erosao_sample() {
+        let matrix = vec![4.8, 3.4, 3.8, 4.5];
+        let criteria = Criteria {
+            pixels: matrix.iter().map(|x| *x as f64),
+            weight: 2.0,
+            function: LinearFunction { p: 5.0 },
+        };
+        let mut res = vec![0f64; 4];
+        Vanilla::rank(criteria, res.as_mut());
+
+        assert_eq!(res, vec![-0.36, 0.38666667, 0.17333333, -0.2]);
+    }
 }

@@ -5,27 +5,34 @@ An implementation of Promethee 2 based on the "PROMETHEE is not quadratic: An O(
 # Building/Running
 
 ## Build
-To build our project just run ```make``` command in the root directory.
+
+To build our project just run `make` command in the root directory.
 
 ## Run
+
 You can use main.py to manager all your Promethee runs. First, must be specified Promethee version, Fast Promethee is our more stable and fast version, -fp is his flag. To use Umbu version -um must be used and to Vanilla version -van.
 
-Fast Promethee and Umbu use tiff input format, while Vanilla uses txt input format.  
+Fast Promethee and Umbu use tiff input format, while Vanilla uses txt input format.
 
 ## Input format
 
 ### Tiff Format
+
 You must process each criterion separated and finally merge everyone.
 Umbu and Fast Promethee share some flags to must be used, like as:
+
 - Raster name
 - Weight of criteria
 - Preference functions and preference functions parameter
 - Flag to define if criteria are directly proportional to values, otherwise not use this flag.
-Sample as:
+  Sample as:
+
 ```
 python main.py -fp AEMMF.tif 0.5 -type=linear 1 -ismax
 ```
+
 But Fast Promethee has two optionals flags:
+
 - The number of the process which can be used to calculate promethee (Default: 1).
 - Define the max sum MB of RAM used in the all process which will run the algorithm(Default: 1024).
 
@@ -34,7 +41,9 @@ python main.py -fp AEMMF.tif 0.5 -type=linear 1 -size=2048 -proc=4
 ```
 
 Umbu has one optional flag:
+
 - The number of alternatives which will be saved in one chunk.
+
 ```
 python main.py -um AEMMF.tif 0.5 -chunk=100000000 -type=linearWithIndifference 1 0.5
 ```

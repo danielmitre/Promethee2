@@ -1,7 +1,7 @@
 .vscode/
+.venv/
 out/
 *.o
-*.tif
 512
 1024
 2048

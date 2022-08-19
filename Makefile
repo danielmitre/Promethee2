@@ -1,6 +1,8 @@
-CC=g++
+CC=g++-11
 CFLAGS = -std=c++14
-LIBS = -lpthread -ltiff
+LIBS = -lpthread -L/usr/local/Cellar/libtiff/4.4.0_1/lib/ -ltiff
+INC=-I/usr/local/Cellar/libtiff/4.4.0_1/include
+TARGET=-
 
 DEPS = promethee/*.h
 
@@ -10,10 +12,10 @@ OBJS := $(addsuffix .o,$(basename $(SRCS)))
 all: run
 
 promethee/%.o: promethee/%.cpp $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS) $(LIBS)
+	$(CC) -c -o $@ $< $(CFLAGS) $(LIBS) $(INC)
 
 promethee/vanilla/%.o: promethee/vanilla/%.cpp $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS) $(LIBS)
+	$(CC) -c -o $@ $< $(CFLAGS) $(LIBS) $(INC)
 
 run: $(OBJS)
 	$(CC) -o $@ $^ $(LIBS)

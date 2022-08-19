@@ -1,5 +1,7 @@
 from modules import promethee_sort, promethee_calculate
-import sys, os
+import sys
+import os
+
 
 def main():
     if '-sort' in sys.argv:
@@ -14,7 +16,7 @@ def main():
         os.system('mv out.* result_' + sys.argv[2])
         param.append('result_' + sys.argv[2])
         param.append('positions.tif')
-        for i in xrange(3, len(sys.argv)):
+        for i in range(3, len(sys.argv)):
             param.append(sys.argv[i])
         promethee_sort.unsort(param)
         os.system("rm *values*.tif")
@@ -22,8 +24,10 @@ def main():
     elif '-merge' in sys.argv:
         exists = os.path.isfile('caja/playground/src/merge')
         if not exists:
-            os.system("g++ caja/playground/src/merge.cpp -o caja/playground/src/merge -std=c++14 -ltiff")
-        os.system(' '.join(['./caja/playground/src/merge'] + list(sys.argv[2:])))
+            os.system(
+                "g++ caja/playground/src/merge.cpp -o caja/playground/src/merge -std=c++14 -ltiff")
+        os.system(
+            ' '.join(['./caja/playground/src/merge'] + list(sys.argv[2:])))
     else:
         promethee_calculate.calculate(sys.argv[1:])
 

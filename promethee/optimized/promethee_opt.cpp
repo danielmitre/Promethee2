@@ -10,14 +10,16 @@
 #include "../parse_directory.h"
 #include "../parse_args.h"
 
-void PrometheeOpt::init(vector<string> args, int divideBy){
+void PrometheeOpt::init(vector<string> args, int divideBy)
+{
   this->divideBy = divideBy;
-  
+
   // Get type of function
   string type = getCmdOption(args, "-type");
-  if(!type.size() || (type != "linear" && type != "linearWithIndifference")){
-      cerr << "Error: incorrect arguments." << endl;
-      exit(0);
+  if (!type.size() || (type != "linear" && type != "linearWithIndifference"))
+  {
+    cerr << "Error: incorrect arguments." << endl;
+    exit(0);
   }
 
   this->isMax = hasFlag(args, "-ismax");
@@ -30,22 +32,25 @@ void PrometheeOpt::init(vector<string> args, int divideBy){
 
   // the remaining args are function args
   vector<ldouble> params;
-  for(int i = 2; i < args.size(); i++)
-      params.push_back(atof(args[i].c_str()));
+  for (int i = 2; i < args.size(); i++)
+    params.push_back(atof(args[i].c_str()));
 
   // build specific funcion implementation
-  if(type == "linear"){
-      this->function = new LinearFunction(params);
-  } else if(type == "linearWithIndifference"){
-      this->function = new LinearWithIndifferenceFunction(params);
+  if (type == "linear")
+  {
+    this->function = new LinearFunction(params);
+  }
+  else if (type == "linearWithIndifference")
+  {
+    this->function = new LinearWithIndifferenceFunction(params);
   }
 }
 
-
-void PrometheeOpt::process() {
+void PrometheeOpt::process()
+{
 
   // Open input and get fields need to create similar file for output
-  TIFF *input = TIFFOpen(this->filename.c_str(), "rm");
+  TIFF *input = TIFFOpen(this->filename.c_str(), "r");
   TIFFGetField(input, TIFFTAG_IMAGEWIDTH, &this->width);
   TIFFGetField(input, TIFFTAG_IMAGELENGTH, &this->height);
   TIFFGetField(input, TIFFTAG_SAMPLEFORMAT, &this->sampleFormat);
@@ -59,11 +64,14 @@ void PrometheeOpt::process() {
   PixelReader pr = PixelReader(this->sampleFormat, byte_size, line);
 
   vector<ldouble> values;
-  for(int i = 0; i < this->height; i++) {
+  for (int i = 0; i < this->height; i++)
+  {
     TIFFReadScanline(input, line, i);
-    for(int j = 0; j < this->width; j++) {
+    for (int j = 0; j < this->width; j++)
+    {
       double aux = pr.readPixel(j);
-      if(!isNaN(aux)) {
+      if (!isNaN(aux))
+      {
         values.push_back(aux);
       }
     }
@@ -75,39 +83,48 @@ void PrometheeOpt::process() {
   vector<ldouble> cummulative(nvalues, 0);
 
   cummulative[0] = values[0];
-  for(int i = 1; i < nvalues; i++) {
+  for (int i = 1; i < nvalues; i++)
+  {
     cummulative[i] = cummulative[i - 1] + values[i];
   }
 
-  for(int i = 0; i < this->height; i++){
+  for (int i = 0; i < this->height; i++)
+  {
     TIFFReadScanline(input, line, i);
-    for(int j = 0; j < this->width; j++){
-      if(!isNaN(pr.readPixel(j))){
+    for (int j = 0; j < this->width; j++)
+    {
+      if (!isNaN(pr.readPixel(j)))
+      {
 
-        if(this->isMax){
+        if (this->isMax)
+        {
           netFlow[i][j] += (*this->function).getPositiveDelta(values, pr.readPixel(j), cummulative, this->weight);
           netFlow[i][j] -= (*this->function).getNegativeDelta(values, pr.readPixel(j), cummulative, this->weight);
-        } else {
+        }
+        else
+        {
           netFlow[i][j] -= (*this->function).getPositiveDelta(values, pr.readPixel(j), cummulative, this->weight);
           netFlow[i][j] += (*this->function).getNegativeDelta(values, pr.readPixel(j), cummulative, this->weight);
         }
-
       }
     }
   }
 
   int denominator = (this->divideBy != -1 ? this->divideBy : nvalues - 1);
   // applying a not standard normalization (but used by grass)
-  for(int i = 0; i < this->height; i++)
-    for(int j = 0; j < this->width; j++){
+  for (int i = 0; i < this->height; i++)
+    for (int j = 0; j < this->width; j++)
+    {
       netFlow[i][j] /= denominator;
     }
 
   TIFF *output = openFile("out." + this->filename, this->width, this->height);
 
   double write_line[this->width];
-  for(int i = 0; i < this->height; i++){
-    for(int j = 0; j < this->width; j++){
+  for (int i = 0; i < this->height; i++)
+  {
+    for (int j = 0; j < this->width; j++)
+    {
       write_line[j] = netFlow[i][j];
     }
     TIFFWriteScanline(output, write_line, i);

@@ -1,5 +1,5 @@
-from osgeo import gdal
 import os
+
 
 def hasFlag(args, key):
     founded = False
@@ -9,11 +9,12 @@ def hasFlag(args, key):
             break
     return founded
 
-def calculate(args):
-     args = list(args)
-     if not hasFlag(args, '-size') and hasFlag(args, '-fp'):
-         args.append('-size=1024')
 
-     if not hasFlag(args, '-type') and (hasFlag(args,'-um') or hasFlag(args, '-fp')):
+def calculate(args):
+    args = list(args)
+    if not hasFlag(args, '-size') and hasFlag(args, '-fp'):
+        args.append('-size=1024')
+
+    if not hasFlag(args, '-type') and (hasFlag(args, '-um') or hasFlag(args, '-fp')):
         raise ValueError("Preference function must be specified")
-     os.system(' '.join(['./run'] + args))
+    os.system(' '.join(['./run'] + args))
