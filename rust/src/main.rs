@@ -38,17 +38,14 @@ fn main() {
     // println!("{:#?}", args);
 
     let criteria = Criteria {
-        pixels: (0..81).step_by(10).map(|x| x as f64),
+        actions: (0..81).step_by(10).map(|x| x as f64),
         weight: args.weight,
         function: args.function,
+        goal: Goal::Min,
     };
 
-    let mut flow = vec![0f64; criteria.pixels.len()];
-
-    match args.version {
-        PrometheeImplementation::Vanilla => {
-            promethee::vanilla::Vanilla::rank(criteria, flow.as_mut());
-        }
+    let flow = match args.version {
+        PrometheeImplementation::Vanilla => promethee::vanilla::Vanilla::rank(vec![criteria]),
         PrometheeImplementation::Fast => {
             unimplemented!("Fast 'n Furious version wasn't implemented yet.");
         }

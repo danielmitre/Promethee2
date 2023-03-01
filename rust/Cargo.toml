@@ -8,4 +8,5 @@ edition = "2018"
 
 [dependencies]
 clap = "3.0.0-beta.2"
+itertools = "0.10.5"
 num = "0.3.0"

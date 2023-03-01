@@ -34,3 +34,14 @@ impl<T: Float> ComparisonFunction<T> for LinearFunction {
         T::one()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn linear_same_value() {
+        let a = LinearFunction { p: 3.66612 };
+        assert_eq!(0.0, a.compare(123.0, 123.0));
+    }
+}
