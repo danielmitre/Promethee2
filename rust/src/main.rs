@@ -15,7 +15,17 @@ enum PrometheeImplementation {
 #[derive(Clap, Debug)]
 enum PreferenceFunction {
     #[clap()]
+    Usual(UsualFunction),
+    #[clap()]
+    Quasi(QuasiFunction),
+    #[clap()]
     Linear(LinearFunction),
+    #[clap()]
+    Level(LevelFunction),
+    #[clap()]
+    LinearWithIndeference(LinearWithIndeferenceFunction),
+    #[clap()]
+    Gaussian(GaussianFunction),
 }
 
 #[derive(Clap, Debug)]
@@ -45,7 +55,9 @@ fn main() {
     };
 
     let flow = match args.version {
-        PrometheeImplementation::Vanilla => promethee::vanilla::Vanilla::rank(vec![criteria]),
+        PrometheeImplementation::Vanilla => {
+            promethee::vanilla::Vanilla::new(true).rank(vec![criteria])
+        }
         PrometheeImplementation::Fast => {
             unimplemented!("Fast 'n Furious version wasn't implemented yet.");
         }

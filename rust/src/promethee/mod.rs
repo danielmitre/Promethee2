@@ -1,9 +1,11 @@
 pub(crate) mod vanilla;
+use num_traits::Pow;
 
 pub(crate) use crate::function::*;
-pub(crate) use num::Float;
-use std::fmt::{Debug, Display};
-pub(crate) use std::ops::{AddAssign, DivAssign};
+use std::{
+    fmt::Debug,
+    ops::{Add, Div, Mul, Neg, Sub},
+};
 
 #[derive(PartialEq, Debug)]
 pub(crate) struct Flow<U> {
@@ -13,14 +15,21 @@ pub(crate) struct Flow<U> {
 }
 
 #[derive(PartialEq, Eq, Debug)]
-pub(crate) struct Criteria<U, T, F>
+pub(crate) struct Criteria<T, I, F>
 where
-    U: Float + DivAssign + AddAssign + Copy,
-    T: ExactSizeIterator<Item = U> + Clone,
-    F: ComparisonFunction<U>,
+    T: From<f64>
+        + Neg<Output = T>
+        + Sub<Output = T>
+        + Div<Output = T>
+        + Mul<Output = T>
+        + Pow<T, Output = T>
+        + PartialOrd
+        + std::marker::Copy,
+    I: ExactSizeIterator<Item = T> + Clone,
+    F: ComparisonFunction<T>,
 {
-    pub(crate) actions: T,
-    pub(crate) weight: U,
+    pub(crate) actions: I,
+    pub(crate) weight: T,
     pub(crate) function: F,
     pub(crate) goal: Goal,
 }
@@ -32,9 +41,17 @@ pub(crate) enum Goal {
 }
 
 pub(crate) trait Promethee {
-    fn rank<U, T, F>(criterias: Vec<Criteria<U, T, F>>) -> Flow<U>
+    fn rank<T, I, F>(self, criterias: Vec<Criteria<T, I, F>>) -> (Flow<T>, Vec<usize>)
     where
-        U: Float + DivAssign + AddAssign + Copy + Display + Debug,
-        T: ExactSizeIterator<Item = U> + Clone,
-        F: ComparisonFunction<U> + Debug;
+        T: From<f64>
+            + Neg<Output = T>
+            + Add<Output = T>
+            + Sub<Output = T>
+            + Div<Output = T>
+            + Mul<Output = T>
+            + Pow<T, Output = T>
+            + PartialOrd
+            + std::marker::Copy,
+        I: ExactSizeIterator<Item = T> + Clone,
+        F: ComparisonFunction<T> + Debug;
 }
