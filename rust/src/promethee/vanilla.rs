@@ -149,26 +149,26 @@ mod tests {
     }
 
     fn assert_approx_eq<T: Copy + Into<f64>>(left: Flow<T>, right: Flow<T>, eps: f64) {
-        // if let Some((pos, l, r)) = eq_floats(
-        //     left.positive_flow.clone().into_iter().map(T::into),
-        //     right.positive_flow.clone().into_iter().map(T::into),
-        //     eps,
-        // ) {
-        //     panic!(
-        //         "positive_flow differs at position {}. left: {}, right: {}\n",
-        //         pos, l, r
-        //     );
-        // }
-        // if let Some((pos, l, r)) = eq_floats(
-        //     left.negative_flow.clone().into_iter().map(T::into),
-        //     right.negative_flow.clone().into_iter().map(T::into),
-        //     eps,
-        // ) {
-        //     panic!(
-        //         "negative_flow differs at position {}. left: {}, right: {}.\n",
-        //         pos, l, r
-        //     );
-        // }
+        if let Some((pos, l, r)) = eq_floats(
+            left.positive_flow.clone().into_iter().map(T::into),
+            right.positive_flow.clone().into_iter().map(T::into),
+            eps,
+        ) {
+            panic!(
+                "positive_flow differs at position {}. left: {}, right: {}\n",
+                pos, l, r
+            );
+        }
+        if let Some((pos, l, r)) = eq_floats(
+            left.negative_flow.clone().into_iter().map(T::into),
+            right.negative_flow.clone().into_iter().map(T::into),
+            eps,
+        ) {
+            panic!(
+                "negative_flow differs at position {}. left: {}, right: {}.\n",
+                pos, l, r
+            );
+        }
         if let Some((pos, l, r)) = eq_floats(
             left.net_flow.clone().into_iter().map(T::into),
             right.net_flow.clone().into_iter().map(T::into),
@@ -296,115 +296,26 @@ mod tests {
         assert_approx_eq(want_flow, got_flow, 1e-9);
     }
 
-    #[derive(Copy, Clone, PartialEq, PartialOrd)]
-    struct Rounded {
-        n: f64,
-    }
-
-    impl From<f64> for Rounded {
-        fn from(value: f64) -> Self {
-            Self { n: value }
-        }
-    }
-
-    impl Into<f64> for Rounded {
-        fn into(self) -> f64 {
-            self.n
-        }
-    }
-
-    impl Add for Rounded {
-        type Output = Rounded;
-
-        fn add(self, rhs: Self) -> Self::Output {
-            Self {
-                n: (1000.0 * (self.n + rhs.n)).round() / 1000.0,
-            }
-        }
-    }
-
-    impl Rem for Rounded {
-        type Output = Rounded;
-
-        fn rem(self, rhs: Self) -> Self::Output {
-            Self { n: self.n % rhs.n }
-        }
-    }
-
-    impl Div for Rounded {
-        type Output = Rounded;
-
-        fn div(self, rhs: Self) -> Self::Output {
-            Self {
-                n: (1000.0 * self.n / rhs.n).round() / 1000.0,
-            }
-        }
-    }
-
-    impl Mul for Rounded {
-        type Output = Rounded;
-
-        fn mul(self, rhs: Self) -> Self::Output {
-            Self {
-                n: (1000.0 * self.n * rhs.n).round() / 1000.0,
-            }
-        }
-    }
-
-    impl Sub for Rounded {
-        type Output = Rounded;
-
-        fn sub(self, rhs: Self) -> Self::Output {
-            Self {
-                n: (1000.0 * (self.n - rhs.n)).round() / 1000.0,
-            }
-        }
-    }
-
-    impl Neg for Rounded {
-        type Output = Rounded;
-
-        fn neg(self) -> Self::Output {
-            Self { n: -self.n }
-        }
-    }
-
-    impl Pow<Rounded> for Rounded {
-        type Output = Rounded;
-
-        fn pow(self, rhs: Rounded) -> Self::Output {
-            Self {
-                n: (1000.0 * self.n.pow(rhs.n)) / 1000.0,
-            }
-        }
-    }
-
-    /// Example taken from https://pubsonline.informs.org/doi/pdf/10.1287/mnsc.31.6.647
+    /// Example taken from https://doi.org/10.1287/mnsc.31.6.647
     #[test]
     fn paper_example() {
         let f1 = Criteria {
-            actions: vec![80.0, 65.0, 83.0, 40.0, 52.0, 94.0]
-                .into_iter()
-                .map(Rounded::from),
-            weight: Rounded::from(1.0),
+            actions: vec![80.0, 65.0, 83.0, 40.0, 52.0, 94.0].into_iter(),
+            weight: 1.0,
             function: PreferenceFunction::Quasi(QuasiFunction { l: 10.0 }),
             goal: Goal::Min,
         };
 
         let f2 = Criteria {
-            actions: vec![90.0, 58.0, 60.0, 80.0, 72.0, 96.0]
-                .into_iter()
-                .map(Rounded::from),
-            weight: Rounded::from(1.0),
+            actions: vec![90.0, 58.0, 60.0, 80.0, 72.0, 96.0].into_iter(),
+            weight: 1.0,
             function: PreferenceFunction::Linear(LinearFunction { m: 30.0 }),
             goal: Goal::Max,
         };
 
         let f3 = Criteria {
-            actions: vec![60.0, 20.0, 40.0, 100.0, 60.0, 70.0]
-                .into_iter()
-                .map(Rounded::from),
-            weight: Rounded::from(1.0),
+            actions: vec![60.0, 20.0, 40.0, 100.0, 60.0, 70.0].into_iter(),
+            weight: 1.0,
             function: PreferenceFunction::LinearWithIndeference(LinearWithIndeferenceFunction {
                 indiference_threshold: 5.0,
                 linear_area: 45.0,
@@ -413,10 +324,8 @@ mod tests {
         };
 
         let f4 = Criteria {
-            actions: vec![5.4, 9.7, 7.2, 7.5, 2.0, 3.6]
-                .into_iter()
-                .map(Rounded::from),
-            weight: Rounded::from(1.0),
+            actions: vec![5.4, 9.7, 7.2, 7.5, 2.0, 3.6].into_iter(),
+            weight: 1.0,
             function: PreferenceFunction::Level(LevelFunction {
                 weak_treshold: 1.0,
                 weak_area: 5.0,
@@ -425,19 +334,15 @@ mod tests {
         };
 
         let f5 = Criteria {
-            actions: vec![8.0, 1.0, 4.0, 7.0, 3.0, 5.0]
-                .into_iter()
-                .map(Rounded::from),
-            weight: Rounded::from(1.0),
+            actions: vec![8.0, 1.0, 4.0, 7.0, 3.0, 5.0].into_iter(),
+            weight: 1.0,
             function: PreferenceFunction::Usual(UsualFunction {}),
             goal: Goal::Min,
         };
 
         let f6 = Criteria {
-            actions: vec![5.0, 1.0, 7.0, 10.0, 8.0, 6.0]
-                .into_iter()
-                .map(Rounded::from),
-            weight: Rounded::from(1.0),
+            actions: vec![5.0, 1.0, 7.0, 10.0, 8.0, 6.0].into_iter(),
+            weight: 1.0,
             function: PreferenceFunction::Gaussian(GaussianFunction { std_dev: 5.0 }),
             goal: Goal::Max,
         };
@@ -445,15 +350,12 @@ mod tests {
         let want_flow = Flow {
             positive_flow: vec![1.099, 1.980, 1.234, 1.644, 2.274, 1.500]
                 .into_iter()
-                .map(Rounded::from)
                 .collect(),
-            negative_flow: vec![1.827, 1.895, 1.681, 1.786, 0.808, 1.744]
+            negative_flow: vec![1.827, 1.895, 1.681, 1.746, 0.808, 1.774]
                 .into_iter()
-                .map(Rounded::from)
                 .collect(),
             net_flow: vec![-0.728, 0.085, -0.447, -0.102, 1.466, -0.274]
                 .into_iter()
-                .map(Rounded::from)
                 .collect(),
         };
 
@@ -464,5 +366,80 @@ mod tests {
 
         assert_eq!(want_rank, got_rank);
         assert_approx_eq(want_flow, got_flow, 1e-2);
+    }
+
+    ///  https://doi.org/10.2478/fman-2020-0008
+    #[test]
+    fn paper2_example() {
+        let processor = Criteria {
+            actions: vec![3.0, 5.0, 5.0, 7.0, 5.0, 3.0].into_iter(),
+            weight: 37.657,
+            function: LinearFunction { m: 4.0 },
+            goal: Goal::Max,
+        };
+
+        let storage = Criteria {
+            actions: vec![5.0, 7.0, 9.0, 9.0, 7.0, 5.0].into_iter(),
+            weight: 9.395,
+            function: LinearFunction { m: 4.0 },
+            goal: Goal::Max,
+        };
+
+        let operating_system = Criteria {
+            actions: vec![3.0, 5.0, 9.0, 9.0, 9.0, 5.0].into_iter(),
+            weight: 4.529,
+            function: LinearFunction { m: 6.0 },
+            goal: Goal::Max,
+        };
+
+        let ram = Criteria {
+            actions: vec![5.0, 5.0, 7.0, 9.0, 7.0, 5.0].into_iter(),
+            weight: 21.594,
+            function: LinearFunction { m: 4.0 },
+            goal: Goal::Max,
+        };
+
+        let screen = Criteria {
+            actions: vec![3.0, 7.0, 7.0, 9.0, 7.0, 7.0].into_iter(),
+            weight: 16.932,
+            function: LinearFunction { m: 6.0 },
+            goal: Goal::Max,
+        };
+
+        let brand = Criteria {
+            actions: vec![9.0, 3.0, 7.0, 2.0, 9.0, 5.0].into_iter(),
+            weight: 7.647,
+            function: LinearFunction { m: 7.0 },
+            goal: Goal::Max,
+        };
+
+        let color = Criteria {
+            actions: vec![3.0, 3.0, 5.0, 9.0, 9.0, 3.0].into_iter(),
+            weight: 2.247,
+            function: LinearFunction { m: 6.0 },
+            goal: Goal::Max,
+        };
+
+        let want_flow = Flow {
+            positive_flow: vec![0.04151, 0.12188, 0.26870, 0.60934, 0.26058, 0.03652],
+            negative_flow: vec![0.49889, 0.22204, 0.08527, 0.05025, 0.08933, 0.39276],
+            net_flow: vec![-0.45738, -0.10015, 0.18343, 0.55909, 0.17125, -0.35624],
+        };
+
+        let want_rank = vec![3, 2, 4, 1, 5, 0];
+
+        let promethee = Vanilla::new(true);
+        let (got_flow, got_rank) = promethee.rank(vec![
+            processor,
+            storage,
+            operating_system,
+            ram,
+            screen,
+            brand,
+            color,
+        ]);
+
+        assert_eq!(want_rank, got_rank);
+        assert_approx_eq(want_flow, got_flow, 1e-5);
     }
 }
