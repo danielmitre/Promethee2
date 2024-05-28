@@ -122,10 +122,7 @@ impl Promethee for Vanilla {
 
 #[cfg(test)]
 mod tests {
-    use std::{
-        ops::{Add, Div, Mul, Rem, Sub},
-        vec,
-    };
+    use std::vec;
 
     use crate::PreferenceFunction;
 

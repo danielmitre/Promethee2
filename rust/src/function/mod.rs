@@ -184,8 +184,6 @@ where
 
 #[cfg(test)]
 mod tests {
-    use std::fmt;
-
     use super::*;
     fn assert_eq_float(left: f64, right: f64, eps: f64) {
         if (left - right).abs() > eps {
